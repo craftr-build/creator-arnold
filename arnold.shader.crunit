@@ -1,0 +1,58 @@
+# DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+# Version 2, December 2004
+#
+# Copyright (C) 2015 Niklas Rosenstein
+#
+# Everyone is permitted to copy and distribute verbatim or modified
+# copies of this license document, and changing it is allowed as long
+# as the name is changed.
+#
+# DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE TERMS AND CONDITIONS
+# FOR COPYING, DISTRIBUTION AND MODIFICATION
+#
+# 0. You just DO WHAT THE FUCK YOU WANT TO.
+"""
+solidangle.arnold.shader
+========================
+
+This Unit Script provides all the necessary information to build an
+Arnold Shader cross-platform.
+
+Required Definitions:
+
+==================== ===================================================
+Variable             Description
+==================== ===================================================
+SDKPath              Path to the Arnold SDK.
+==================== ===================================================
+
+Declarations:
+
+==================== ===================================================
+Variable             Description
+==================== ===================================================
+Libs                 A list of libraries to link.
+Libpath              A list of paths that may contain libraries to link with.
+(CompileShader       Compiles an Arnold shader from the input file(s)
+  fout, fin, [flgs])   *fin* to the output file *fout*. *flgs* may list
+                       additional compiler flags.
+==================== ===================================================
+"""
+
+if not defined('self:SDKPath'):
+  raise EnvironmentError(eval('"${self}:SDKPath" not set'))
+
+platform = eval('$Platform')
+if platform == 'Windows':
+  load('compiler.msvc')
+  if not defined('compiler.msvc:Detected'):
+    message = 'MSVC Platform Toolset could not be detected. Do you want to continue?'
+    if not confirm(message):
+      exit(1)
+
+  define('Arch', '$compiler.msvc:Arch')
+  define('Libs', 'ai.lib')
+  define('Libpath', '$SDKPath/lib')
+  define('CompileShader', 'cl /LD /I "$SDKPath/include" /EHsc $"{$1} /link $"{$(addprefix /LIBPATH:,$Libpath)} $"{$Libs} /OUT:"$0"')
+else:
+  raise EnvironmentError(eval('unsupported Platform "$Platform"'))
