@@ -17,10 +17,13 @@ define('BuildDir',      '$ProjectPath/build/${ai:Arch}')
 define('ShaderSources', '$*($SourceDir/shaders/*.cpp)')
 define('ShaderOutputs', '$(p:dll $(move $ShaderSources, $SourceDir, $BuildDir))')
 
-@target
-def shaders():
-  for fin, fout in foreach_split('$ShaderSources', '$ShaderOutputs'):
-    shaders.add('$fin', '$fout', '$(ai:CompileShader $@, $<)')
+target(
+  name='shaders',
+  inputs='$ShaderSources',
+  outputs='$ShaderOutputs',
+  command='$(ai:CompileShader $@, $<)',
+  for_each=True,
+)
 ```
 
 __Todo__
